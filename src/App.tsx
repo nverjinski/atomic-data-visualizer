@@ -1,15 +1,7 @@
 import { ThemeProvider } from "@mui/material/styles";
-import {
-  CssBaseline,
-  Button,
-  Typography,
-  Box,
-  Paper,
-  Container,
-} from "@mui/material";
-import { DataObject as DataObjectIcon } from "@mui/icons-material";
+import { CssBaseline, Box } from "@mui/material";
 import theme from "./theme";
-import { Sidebar } from "./components";
+import { Sidebar, ResponsiveGrid } from "./components";
 
 function App() {
   return (
@@ -36,47 +28,11 @@ function App() {
             backgroundColor: (theme) => theme.palette.voxel.gray800,
           }}
         >
-          <Box sx={{ display: "flex", minHeight: "100%" }}>
+          <Box sx={{ display: "flex", height: "100%" }}>
             <Sidebar />
-            <Container maxWidth="lg" disableGutters sx={{ p: 2, flexGrow: 1 }}>
-              <Box sx={{ py: 4 }}>
-                <Paper
-                  elevation={3}
-                  sx={{ p: 3, mb: 3, backgroundColor: "background.paper" }}
-                >
-                  <Typography
-                    variant="h5"
-                    component="h2"
-                    gutterBottom
-                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                  >
-                    <DataObjectIcon />
-                    Material-UI Integration
-                  </Typography>
-                  <Typography variant="body1" paragraph>
-                    Your app now supports Material-UI components! This Paper
-                    component demonstrates the dark theme integration.
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                    <Button variant="contained" color="primary">
-                      Primary Button
-                    </Button>
-                    <Button variant="outlined" color="secondary">
-                      Secondary Button
-                    </Button>
-                    <Button variant="text">Text Button</Button>
-                  </Box>
-                </Paper>
-
-                {/* Original Content */}
-                <div className="text-xl font-semibold mb-4 text-primary-text">
-                  Data Visualization
-                </div>
-                <div className="text-primary-text">
-                  This is a data visualization of the atomic data.
-                </div>
-              </Box>
-            </Container>
+            <Box sx={{ flexGrow: 1, height: "100%" }}>
+              <ResponsiveGrid />
+            </Box>
           </Box>
         </Box>
       </Box>
