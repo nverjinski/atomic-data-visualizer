@@ -19,9 +19,8 @@ interface ContainerSize {
   height: number;
 }
 
-const COLUMN_WIDTH = 204;
-const ROW_HEIGHT = 204;
-const GAP = 2;
+const MIN_COLUMN_WIDTH = 200;
+const GAP = 4;
 
 export default function ResponsiveGrid() {
   const [samples, setSamples] = useState<Sample[]>([]);
@@ -78,8 +77,13 @@ export default function ResponsiveGrid() {
   // Calculate columns based on container width
   const columnCount = Math.max(
     1,
-    Math.floor(containerSize.width / COLUMN_WIDTH)
+    Math.floor(containerSize.width / MIN_COLUMN_WIDTH)
   );
+
+  // Calculate actual column width by distributing available space
+  const actualColumnWidth = Math.floor(containerSize.width / columnCount);
+  const actualRowHeight = actualColumnWidth; // Keep square aspect ratio
+
   const rowCount = Math.ceil(samples.length / columnCount);
 
   // Cell renderer
@@ -92,6 +96,9 @@ export default function ResponsiveGrid() {
         return <div style={style} />;
       }
 
+      // Calculate image size (cell size minus gap)
+      const imageSize = actualColumnWidth - GAP * 2;
+
       return (
         <div
           style={{
@@ -102,8 +109,8 @@ export default function ResponsiveGrid() {
         >
           <Box
             sx={{
-              width: 200,
-              height: 200,
+              width: imageSize,
+              height: imageSize,
               backgroundColor: "background.paper",
               borderRadius: 1,
               overflow: "hidden",
@@ -130,7 +137,7 @@ export default function ResponsiveGrid() {
         </div>
       );
     },
-    [samples, columnCount]
+    [samples, columnCount, actualColumnWidth]
   );
 
   if (loading) {
@@ -176,26 +183,21 @@ export default function ResponsiveGrid() {
         minWidth: 0,
         flexGrow: 1,
         overflow: "hidden",
-        display: "flex",
-        justifyContent: "center",
       }}
     >
       {containerSize.width > 0 && containerSize.height > 0 && (
-        <div className="w-[${columnCount * COLUMN_WIDTH}px] h-[${containerSize.height}px]">
-          <Grid
-            cellComponent={Cell}
-            cellProps={{}}
-            columnCount={columnCount}
-            columnWidth={COLUMN_WIDTH}
-            style={{
-              height: containerSize.height,
-              width: columnCount * COLUMN_WIDTH,
-              //margin: "0 auto",
-            }}
-            rowCount={rowCount}
-            rowHeight={ROW_HEIGHT}
-          />
-        </div>
+        <Grid
+          cellComponent={Cell}
+          cellProps={{}}
+          columnCount={columnCount}
+          columnWidth={actualColumnWidth}
+          style={{
+            height: containerSize.height,
+            width: containerSize.width,
+          }}
+          rowCount={rowCount}
+          rowHeight={actualRowHeight}
+        />
       )}
     </Box>
   );
