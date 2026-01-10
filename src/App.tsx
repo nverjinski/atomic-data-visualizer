@@ -24,13 +24,19 @@ function App() {
         <Box
           sx={{
             flexGrow: 1,
-            overflow: "auto",
+            overflow: "hidden",
             backgroundColor: (theme) => theme.palette.voxel.gray800,
           }}
         >
           <Box sx={{ display: "flex", height: "100%" }}>
             <Sidebar />
-            <Box sx={{ flexGrow: 1, height: "100%" }}>
+            <Box
+              sx={{
+                flexGrow: 1,
+                height: "100%",
+                minWidth: 0,
+              }}
+            >
               <ResponsiveGrid />
             </Box>
           </Box>

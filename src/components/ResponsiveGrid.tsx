@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Grid } from "react-window";
 import type { CellComponentProps } from "react-window";
 import { Box, CircularProgress, Typography } from "@mui/material";
@@ -14,15 +14,25 @@ interface Sample {
   }>;
 }
 
-const COLUMN_WIDTH = 200;
-const ROW_HEIGHT = 200;
-const GAP = 0;
+interface ContainerSize {
+  width: number;
+  height: number;
+}
+
+const COLUMN_WIDTH = 204;
+const ROW_HEIGHT = 204;
+const GAP = 2;
 
 export default function ResponsiveGrid() {
   const [samples, setSamples] = useState<Sample[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [containerSize, setContainerSize] = useState<ContainerSize>({
+    width: 0,
+    height: 0,
+  });
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Fetch all samples
   useEffect(() => {
@@ -45,20 +55,25 @@ export default function ResponsiveGrid() {
 
   // Measure container size
   useEffect(() => {
+    if (loading) return;
+
+    const container = containerRef.current;
+    if (!container) return;
+
     const updateSize = () => {
-      const container = document.getElementById("grid-container");
-      if (container) {
-        setContainerSize({
-          width: container.clientWidth,
-          height: container.clientHeight,
-        });
-      }
+      setContainerSize({
+        width: container.clientWidth,
+        height: container.clientHeight,
+      });
     };
 
     updateSize();
-    window.addEventListener("resize", updateSize);
-    return () => window.removeEventListener("resize", updateSize);
-  }, []);
+
+    const ro = new ResizeObserver(updateSize);
+    ro.observe(container);
+
+    return () => ro.disconnect();
+  }, [loading]);
 
   // Calculate columns based on container width
   const columnCount = Math.max(
@@ -155,11 +170,11 @@ export default function ResponsiveGrid() {
 
   return (
     <Box
-      id="grid-container"
+      ref={containerRef}
       sx={{
         width: "100%",
         height: "100%",
-        position: "relative",
+        minWidth: 0,
       }}
     >
       {containerSize.width > 0 && containerSize.height > 0 && (
@@ -168,8 +183,10 @@ export default function ResponsiveGrid() {
           cellProps={{}}
           columnCount={columnCount}
           columnWidth={COLUMN_WIDTH}
-          defaultHeight={containerSize.height}
-          defaultWidth={containerSize.width}
+          style={{
+            height: containerSize.height,
+            width: containerSize.width,
+          }}
           rowCount={rowCount}
           rowHeight={ROW_HEIGHT}
         />
