@@ -1,6 +1,6 @@
 export const samples = Array.from({ length: 10000 }).map((_, i) => ({
   id: i,
-  url: `https://picsum.photos/id/${i % 1000}/400/400`, // Cycles through 1000 images
+  url: `https://picsum.photos/id/${i % 1000}/200/200`, // Cycles through 1000 images
   labels: [
     {
       type: "prediction",
