@@ -197,7 +197,7 @@ export default function ResponsiveGrid() {
           }}
           rowCount={rowCount}
           rowHeight={actualRowHeight}
-          overscanCount={20}
+          overscanCount={10}
         />
       )}
     </Box>
