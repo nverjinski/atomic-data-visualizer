@@ -38,7 +38,7 @@ export default function ResponsiveGrid() {
     const fetchSamples = async () => {
       try {
         setLoading(true);
-        const response = await SampleService.getSamples(500, 0);
+        const response = await SampleService.getSamples(10000, 0);
         setSamples(response.samples);
         setError(null);
       } catch (err) {
@@ -131,7 +131,7 @@ export default function ResponsiveGrid() {
                 objectFit: "cover",
                 display: "block",
               }}
-              loading="lazy"
+              //loading="lazy"
             />
           </Box>
         </div>
@@ -197,6 +197,7 @@ export default function ResponsiveGrid() {
           }}
           rowCount={rowCount}
           rowHeight={actualRowHeight}
+          overscanCount={20}
         />
       )}
     </Box>
