@@ -172,24 +172,30 @@ export default function ResponsiveGrid() {
     <Box
       ref={containerRef}
       sx={{
-        width: "100%",
         height: "100%",
         minWidth: 0,
+        flexGrow: 1,
+        overflow: "hidden",
+        display: "flex",
+        justifyContent: "center",
       }}
     >
       {containerSize.width > 0 && containerSize.height > 0 && (
-        <Grid
-          cellComponent={Cell}
-          cellProps={{}}
-          columnCount={columnCount}
-          columnWidth={COLUMN_WIDTH}
-          style={{
-            height: containerSize.height,
-            width: containerSize.width,
-          }}
-          rowCount={rowCount}
-          rowHeight={ROW_HEIGHT}
-        />
+        <div className="w-[${columnCount * COLUMN_WIDTH}px] h-[${containerSize.height}px]">
+          <Grid
+            cellComponent={Cell}
+            cellProps={{}}
+            columnCount={columnCount}
+            columnWidth={COLUMN_WIDTH}
+            style={{
+              height: containerSize.height,
+              width: columnCount * COLUMN_WIDTH,
+              //margin: "0 auto",
+            }}
+            rowCount={rowCount}
+            rowHeight={ROW_HEIGHT}
+          />
+        </div>
       )}
     </Box>
   );
