@@ -1,14 +1,13 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { Grid } from "react-window";
 import type { CellComponentProps } from "react-window";
-import { Box, CircularProgress, Typography } from "@mui/material";
-import { SampleService } from "../services/SampleService";
-import LabelOverlay from "./LabelOverlay";
+import { Box } from "@mui/material";
+import { LazyImage } from "./index";
 import type { LabelDataType } from "./LabelOverlay";
 import { useRecoilValue } from "recoil";
 import { imageSelector } from "../state/atoms";
 
-interface Sample {
+export interface Sample {
   id: number;
   url: string;
   labels: LabelDataType[];
@@ -98,57 +97,7 @@ export default function ResponsiveGrid() {
             boxSizing: "border-box",
           }}
         >
-          <Box
-            sx={{
-              width: imageSize,
-              height: imageSize,
-              backgroundColor: "background.paper",
-              borderRadius: 1,
-              overflow: "hidden",
-              boxShadow: 2,
-              transition: "transform 0.2s, box-shadow 0.2s",
-              "&:hover": {
-                transform: "scale(1.02)",
-                boxShadow: 4,
-              },
-              position: "relative",
-            }}
-          >
-            <img
-              key={retryCount} // Force remount on retry
-              src={sample.url}
-              alt={`Sample ${sample.id}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                display: "block",
-              }}
-              onError={handleImageError}
-              onLoad={() => {
-                setImageFailed(false);
-              }}
-              //loading="lazy"
-            />
-            {imageFailed && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  height: "100%",
-                  background:
-                    "linear-gradient(135deg, #404040 0%, #000000 100%)",
-                  //filter: "blur(4px)",
-                  display: "block",
-                }}
-              />
-            )}
-            {sample.labels.map((label) => (
-              <LabelOverlay key={label.type} labelData={label} />
-            ))}
-          </Box>
+          <LazyImage imageSample={sample} imageSize={imageSize} />
         </div>
       );
     },
