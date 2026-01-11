@@ -3,15 +3,13 @@ import { Grid } from "react-window";
 import type { CellComponentProps } from "react-window";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { SampleService } from "../services/SampleService";
+import LabelOverlay from "./LabelOverlay";
+import type { LabelDataType } from "./LabelOverlay";
 
 interface Sample {
   id: number;
   url: string;
-  labels: Array<{
-    type: string;
-    box: number[];
-    label: string;
-  }>;
+  labels: LabelDataType[];
 }
 
 interface ContainerSize {
@@ -39,7 +37,7 @@ export default function ResponsiveGrid() {
       try {
         setLoading(true);
         const response = await SampleService.getSamples(10000, 0);
-        setSamples(response.samples);
+        setSamples(response.samples as Sample[]);
         setError(null);
       } catch (err) {
         setError("Failed to load samples");
@@ -120,6 +118,7 @@ export default function ResponsiveGrid() {
                 transform: "scale(1.02)",
                 boxShadow: 4,
               },
+              position: "relative",
             }}
           >
             <img
@@ -133,6 +132,9 @@ export default function ResponsiveGrid() {
               }}
               //loading="lazy"
             />
+            {sample.labels.map((label) => (
+              <LabelOverlay key={label.type} labelData={label} />
+            ))}
           </Box>
         </div>
       );
