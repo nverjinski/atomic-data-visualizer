@@ -21,11 +21,12 @@ export default function Sidebar() {
   const [visibility, setVisibility] = useRecoilState(visibilityState);
 
   const handleCheckboxChange =
-    (item: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    (item: string) =>
+    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
       const key = item.toLowerCase().replace(" ", "_");
       setVisibility((prev) => ({
         ...prev,
-        [key]: event.target.checked,
+        [key]: checked,
       }));
     };
 
@@ -84,7 +85,7 @@ export default function Sidebar() {
                       control={
                         <Checkbox
                           checked={checked}
-                          onChange={handleCheckboxChange(item)}
+                          onChange={handleCheckboxChange(key)}
                           size="small"
                         />
                       }
