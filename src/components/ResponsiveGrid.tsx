@@ -5,6 +5,8 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import { SampleService } from "../services/SampleService";
 import LabelOverlay from "./LabelOverlay";
 import type { LabelDataType } from "./LabelOverlay";
+import { useRecoilValue } from "recoil";
+import { imageSelector } from "../state/atoms";
 
 interface Sample {
   id: number;
@@ -21,9 +23,6 @@ const MIN_COLUMN_WIDTH = 100;
 const GAP = 2;
 
 export default function ResponsiveGrid() {
-  const [samples, setSamples] = useState<Sample[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [containerSize, setContainerSize] = useState<ContainerSize>({
     width: 0,
     height: 0,
@@ -31,29 +30,10 @@ export default function ResponsiveGrid() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch all samples
-  useEffect(() => {
-    const fetchSamples = async () => {
-      try {
-        setLoading(true);
-        const response = await SampleService.getSamples(10000, 0);
-        setSamples(response.samples as Sample[]);
-        setError(null);
-      } catch (err) {
-        setError("Failed to load samples");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSamples();
-  }, []);
+  const samples = useRecoilValue(imageSelector) as Sample[];
 
   // Measure container size
   useEffect(() => {
-    if (loading) return;
-
     const container = containerRef.current;
     if (!container) return;
 
@@ -70,7 +50,7 @@ export default function ResponsiveGrid() {
     ro.observe(container);
 
     return () => ro.disconnect();
-  }, [loading]);
+  }, []);
 
   // Calculate columns based on container width
   const columnCount = Math.max(
@@ -175,41 +155,6 @@ export default function ResponsiveGrid() {
     [samples, columnCount, actualColumnWidth]
   );
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        <CircularProgress />
-        <Typography variant="body1">Loading samples...</Typography>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100%",
-        }}
-      >
-        <Typography variant="h6" color="error">
-          {error}
-        </Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box
       ref={containerRef}
@@ -232,7 +177,7 @@ export default function ResponsiveGrid() {
           }}
           rowCount={rowCount}
           rowHeight={actualRowHeight}
-          overscanCount={22} // this is high, but image loads take around 600ms. Fast scrolling will show flickering at low values
+          overscanCount={5} // setting this high will look better, but using a priority queue is smarter
         />
       )}
     </Box>

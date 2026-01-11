@@ -1,5 +1,6 @@
+import { Suspense } from "react";
 import { ThemeProvider } from "@mui/material/styles";
-import { CssBaseline, Box } from "@mui/material";
+import { CssBaseline, Box, CircularProgress, Typography } from "@mui/material";
 import theme from "./theme";
 import { Sidebar, ResponsiveGrid } from "./components";
 
@@ -30,7 +31,26 @@ function App() {
         >
           <Box sx={{ display: "flex", height: "100%" }}>
             <Sidebar />
-            <ResponsiveGrid />
+            <Suspense
+              fallback={
+                <Box
+                  sx={{
+                    display: "flex",
+                    grow: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "100%",
+                    flexDirection: "column",
+                    gap: 2,
+                  }}
+                >
+                  <CircularProgress />
+                  <Typography variant="body1">Loading samples...</Typography>
+                </Box>
+              }
+            >
+              <ResponsiveGrid />
+            </Suspense>
           </Box>
         </Box>
       </Box>
