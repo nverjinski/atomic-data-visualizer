@@ -3,8 +3,8 @@ import { atom } from "recoil";
 export const visibilityState = atom({
   key: "visibilityState",
   default: {
-    prediction: true,
-    ground_truth: true,
-    confidence: true,
+    prediction: false,
+    ground_truth: false,
+    confidence: false,
   },
 });
