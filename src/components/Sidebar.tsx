@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Drawer,
   List,
@@ -20,15 +21,37 @@ const labelItems = ["Prediction", "Ground Truth", "Confidence"];
 export default function Sidebar() {
   const [visibility, setVisibility] = useRecoilState(visibilityState);
 
-  const handleCheckboxChange =
-    (item: string) =>
-    (event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      const key = item.toLowerCase().replace(" ", "_");
-      setVisibility((prev) => ({
-        ...prev,
-        [key]: checked,
-      }));
-    };
+  // Create stable change handlers to prevent re-renders
+  const changeHandlers = useMemo(
+    () => ({
+      prediction: (
+        event: React.ChangeEvent<HTMLInputElement>,
+        checked: boolean
+      ) => setVisibility((prev) => ({ ...prev, prediction: checked })),
+      ground_truth: (
+        event: React.ChangeEvent<HTMLInputElement>,
+        checked: boolean
+      ) => setVisibility((prev) => ({ ...prev, ground_truth: checked })),
+      confidence: (
+        event: React.ChangeEvent<HTMLInputElement>,
+        checked: boolean
+      ) => setVisibility((prev) => ({ ...prev, confidence: checked })),
+    }),
+    [setVisibility]
+  );
+
+  // Memoize the sx object to prevent recreation on every render
+  const formControlSx = useMemo(
+    () => ({
+      width: "100%",
+      margin: 0,
+      padding: "8px 16px",
+      "& .MuiFormControlLabel-label": {
+        fontSize: "0.875rem",
+      },
+    }),
+    []
+  );
 
   return (
     <Drawer
@@ -76,8 +99,11 @@ export default function Sidebar() {
           <AccordionDetails sx={{ p: 0 }}>
             <List disablePadding>
               {labelItems.map((item) => {
-                const key = item.toLowerCase().replace(" ", "_");
-                const checked = visibility[key as keyof typeof visibility];
+                const key = item
+                  .toLowerCase()
+                  .replace(" ", "_") as keyof typeof visibility;
+                const checked = visibility[key];
+                const onChange = changeHandlers[key];
 
                 return (
                   <ListItem key={item} disablePadding>
@@ -85,19 +111,12 @@ export default function Sidebar() {
                       control={
                         <Checkbox
                           checked={checked}
-                          onChange={handleCheckboxChange(key)}
+                          onChange={onChange}
                           size="small"
                         />
                       }
                       label={item}
-                      sx={{
-                        width: "100%",
-                        margin: 0,
-                        padding: "8px 16px",
-                        "& .MuiFormControlLabel-label": {
-                          fontSize: "0.875rem",
-                        },
-                      }}
+                      sx={formControlSx}
                     />
                   </ListItem>
                 );

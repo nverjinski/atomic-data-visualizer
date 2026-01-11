@@ -28,7 +28,7 @@ const LabelOverlay = ({ labelData }: LabelOverlayProps) => {
         height: `${h}%`,
         border:
           labelData.type === "prediction" ? "2px solid red" : "2px solid green",
-        pointerEvents: "none", // Ensures clicks go through to the image
+        pointerEvents: "none",
       }}
     >
       <span className="label-text">{labelData.label}</span>
