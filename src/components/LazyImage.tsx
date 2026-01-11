@@ -54,7 +54,7 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
         onLoad={() => {
           setImageFailed(false);
         }}
-        //loading="lazy"
+        //loading="lazy" // we're implementing our own lazy loading
       />
       {imageFailed && (
         <div
