@@ -36,6 +36,7 @@ function App() {
                 <Box
                   sx={{
                     display: "flex",
+                    flexGrow: 1,
                     grow: 1,
                     justifyContent: "center",
                     alignItems: "center",
