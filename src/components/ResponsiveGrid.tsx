@@ -88,8 +88,20 @@ export default function ResponsiveGrid() {
   const Cell = useCallback(
     ({ columnIndex, rowIndex, style }: CellComponentProps) => {
       const [imageFailed, setImageFailed] = useState(false);
+      const [retryCount, setRetryCount] = useState(0);
       const index = rowIndex * columnCount + columnIndex;
       const sample = samples[index];
+
+      // Handle image errors with automatic retry
+      const handleImageError = useCallback(() => {
+        setImageFailed(true);
+        if (retryCount < 2) {
+          // Retry up to 2 times with 1 second delay
+          setTimeout(() => {
+            setRetryCount((prev) => prev + 1);
+          }, 1000);
+        }
+      }, [retryCount]);
 
       if (!sample) {
         return <div style={style} />;
@@ -122,29 +134,35 @@ export default function ResponsiveGrid() {
               position: "relative",
             }}
           >
-            {imageFailed ? (
+            <img
+              key={retryCount} // Force remount on retry
+              src={sample.url}
+              alt={`Sample ${sample.id}`}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                display: "block",
+              }}
+              onError={handleImageError}
+              onLoad={() => {
+                setImageFailed(false);
+              }}
+              //loading="lazy"
+            />
+            {imageFailed && (
               <div
                 style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
                   width: "100%",
                   height: "100%",
                   background:
                     "linear-gradient(135deg, #404040 0%, #000000 100%)",
-                  filter: "blur(4px)",
+                  //filter: "blur(4px)",
                   display: "block",
                 }}
-              />
-            ) : (
-              <img
-                src={sample.url}
-                alt={`Sample ${sample.id}`}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-                onError={() => setImageFailed(true)}
-                //loading="lazy"
               />
             )}
             {sample.labels.map((label) => (
@@ -214,7 +232,7 @@ export default function ResponsiveGrid() {
           }}
           rowCount={rowCount}
           rowHeight={actualRowHeight}
-          overscanCount={9}
+          overscanCount={22} // this is high, but image loads take around 600ms. Fast scrolling will show flickering at low values
         />
       )}
     </Box>
