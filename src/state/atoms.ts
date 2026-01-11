@@ -5,5 +5,6 @@ export const visibilityState = atom({
   default: {
     prediction: true,
     ground_truth: true,
+    confidence: true,
   },
 });
