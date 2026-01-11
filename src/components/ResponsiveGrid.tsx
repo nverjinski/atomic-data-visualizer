@@ -17,8 +17,8 @@ interface ContainerSize {
   height: number;
 }
 
-const MIN_COLUMN_WIDTH = 200;
-const GAP = 4;
+const MIN_COLUMN_WIDTH = 100;
+const GAP = 2;
 
 export default function ResponsiveGrid() {
   const [samples, setSamples] = useState<Sample[]>([]);
@@ -87,6 +87,7 @@ export default function ResponsiveGrid() {
   // Cell renderer
   const Cell = useCallback(
     ({ columnIndex, rowIndex, style }: CellComponentProps) => {
+      const [imageFailed, setImageFailed] = useState(false);
       const index = rowIndex * columnCount + columnIndex;
       const sample = samples[index];
 
@@ -121,17 +122,31 @@ export default function ResponsiveGrid() {
               position: "relative",
             }}
           >
-            <img
-              src={sample.url}
-              alt={`Sample ${sample.id}`}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                display: "block",
-              }}
-              //loading="lazy"
-            />
+            {imageFailed ? (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  background:
+                    "linear-gradient(135deg, #404040 0%, #000000 100%)",
+                  filter: "blur(4px)",
+                  display: "block",
+                }}
+              />
+            ) : (
+              <img
+                src={sample.url}
+                alt={`Sample ${sample.id}`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+                onError={() => setImageFailed(true)}
+                //loading="lazy"
+              />
+            )}
             {sample.labels.map((label) => (
               <LabelOverlay key={label.type} labelData={label} />
             ))}
