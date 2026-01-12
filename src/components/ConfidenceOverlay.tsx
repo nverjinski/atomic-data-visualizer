@@ -1,5 +1,5 @@
 import { useRecoilValue } from "recoil";
-import { visibilityState } from "../state/atoms";
+import { visibilityState, confidenceThresholdState } from "../state/atoms";
 
 export type LabelDataType = {
   type: "prediction" | "ground_truth" | "confidence";
@@ -13,8 +13,15 @@ type LabelOverlayProps = {
 
 const LabelOverlay = ({ labelData }: LabelOverlayProps) => {
   const visibility = useRecoilValue(visibilityState);
+  const confidenceThreshold = useRecoilValue(confidenceThresholdState);
 
   if (!visibility.confidence) return null;
+  if (
+    labelData.confidence &&
+    (labelData.confidence < confidenceThreshold.low ||
+      labelData.confidence > confidenceThreshold.high)
+  )
+    return null;
 
   return (
     <>

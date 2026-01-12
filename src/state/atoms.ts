@@ -27,7 +27,7 @@ export const imageSelector = selector({
 export const confidenceThresholdState = atom({
   key: "confidenceThresholdState",
   default: {
-    low: 0.001,
-    high: 0.999,
+    low: 0,
+    high: 1,
   },
 });
