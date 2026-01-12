@@ -153,7 +153,9 @@ export default function Sidebar() {
                   control={
                     <Checkbox
                       checked={filterImages}
-                      onChange={(event) => setFilterImages(event.target.checked)}
+                      onChange={(event) =>
+                        setFilterImages(event.target.checked)
+                      }
                       size="small"
                     />
                   }
