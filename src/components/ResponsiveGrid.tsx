@@ -66,21 +66,8 @@ export default function ResponsiveGrid() {
   // Cell renderer
   const Cell = useCallback(
     ({ columnIndex, rowIndex, style }: CellComponentProps) => {
-      const [imageFailed, setImageFailed] = useState(false);
-      const [retryCount, setRetryCount] = useState(0);
       const index = rowIndex * columnCount + columnIndex;
       const sample = samples[index];
-
-      // Handle image errors with automatic retry
-      const handleImageError = useCallback(() => {
-        setImageFailed(true);
-        if (retryCount < 2) {
-          // Retry up to 2 times with 1 second delay
-          setTimeout(() => {
-            setRetryCount((prev) => prev + 1);
-          }, 1000);
-        }
-      }, [retryCount]);
 
       if (!sample) {
         return <div style={style} />;

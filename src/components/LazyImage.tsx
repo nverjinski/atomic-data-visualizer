@@ -5,6 +5,9 @@ import type { Sample } from "./ResponsiveGrid";
 import { Box } from "@mui/material";
 import { LabelOverlay } from "./index";
 
+// Module-level cache that persists across component unmounts/remounts
+const imageCache = new Map<string, string>();
+
 interface ImageProps {
   imageSample: Sample;
   imageSize: number;
@@ -12,7 +15,10 @@ interface ImageProps {
 
 const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
   const [imageFailed, setImageFailed] = useState(false);
-  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  // Initialize with cached image if available
+  const [imgSrc, setImgSrc] = useState<string | null>(
+    () => imageCache.get(sample.url) || null
+  );
 
   const setStats = useSetRecoilState(performanceStatsState);
 
@@ -31,6 +37,9 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
 
         const blob = await res.blob();
         const objectUrl = URL.createObjectURL(blob);
+
+        // Cache the loaded image
+        imageCache.set(sample.url, objectUrl);
 
         setImgSrc(objectUrl);
         setImageFailed(false);
@@ -53,6 +62,11 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
   );
 
   useEffect(() => {
+    // If image is already cached, no need to observe - just display it
+    if (imgSrc) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -68,11 +82,6 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
             abortControllerRef.current.abort();
             abortControllerRef.current = null;
           }
-
-          if (imgSrc) {
-            URL.revokeObjectURL(imgSrc);
-            setImgSrc(null);
-          }
         }
       },
       { rootMargin: "100px" } // Load slightly before it enters the viewport
@@ -84,9 +93,8 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
 
     return () => {
       observer.disconnect();
-      if (imgSrc) URL.revokeObjectURL(imgSrc);
     };
-  }, [sample.url, loadImage, setStats]); // Note: imgSrc removed from deps to prevent re-run on setImgSrc
+  }, [sample.url, loadImage, setStats, imgSrc]);
 
   return (
     <Box
@@ -100,7 +108,7 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
         boxShadow: 2,
         transition: "transform 0.2s, box-shadow 0.2s",
         "&:hover": {
-          transform: "scale(1.02)",
+          transform: "scale(1.05)",
           boxShadow: 4,
         },
         position: "relative",
