@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { visibilityState } from "../state/atoms";
+import { visibilityState, filterImagesState } from "../state/atoms";
 import { performanceStatsState } from "../state/performanceAtoms";
 import { ConfidenceThresholdSlider } from "./index";
 
@@ -35,6 +35,7 @@ const performanceItems: Array<{ label: string; key: keyof PerformanceStats }> =
 
 export default function Sidebar() {
   const [visibility, setVisibility] = useRecoilState(visibilityState);
+  const [filterImages, setFilterImages] = useRecoilState(filterImagesState);
   const performanceStats = useRecoilValue(performanceStatsState);
 
   // Create stable change handlers to prevent re-renders
@@ -145,8 +146,25 @@ export default function Sidebar() {
               Filters
             </Typography>
           </AccordionSummary>
-          <AccordionDetails sx={{ p: 2 }}>
-            <ConfidenceThresholdSlider />
+          <AccordionDetails sx={{ p: 0 }}>
+            <List disablePadding>
+              <ListItem disablePadding>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={filterImages}
+                      onChange={(event) => setFilterImages(event.target.checked)}
+                      size="small"
+                    />
+                  }
+                  label="Filter Images"
+                  sx={formControlSx}
+                />
+              </ListItem>
+            </List>
+            <Box sx={{ p: 2 }}>
+              <ConfidenceThresholdSlider />
+            </Box>
           </AccordionDetails>
         </Accordion>
         <Accordion

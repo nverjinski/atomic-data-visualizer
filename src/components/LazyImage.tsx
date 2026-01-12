@@ -133,7 +133,7 @@ const LazyImage = ({
           boxShadow: 4,
         },
         position: "relative",
-        border: isSelected ? "2px solid var(--color-primary)" : "none",
+        border: isSelected ? "3px solid var(--color-primary)" : "none",
       }}
       onClick={() => setSelected(!isSelected)}
     >

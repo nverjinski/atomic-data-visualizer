@@ -45,3 +45,8 @@ export const selectedImageCount = selector({
       .length;
   },
 });
+
+export const filterImagesState = atom({
+  key: "filterImagesState",
+  default: false,
+});
