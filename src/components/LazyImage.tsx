@@ -3,7 +3,7 @@ import { useSetRecoilState } from "recoil";
 import { performanceStatsState } from "../state/performanceAtoms";
 import type { Sample } from "./ResponsiveGrid";
 import { Box } from "@mui/material";
-import { LabelOverlay } from "./index";
+import { LabelOverlay, ConfidenceOverlay } from "./index";
 
 // Module-level cache that persists across component unmounts/remounts
 const imageCache = new Map<string, string>();
@@ -152,10 +152,16 @@ const LazyImage = ({
       )}
 
       {sample.labels.map((label, idx) => (
-        <LabelOverlay
-          key={`${sample.id}-${label.type}-${idx}`}
-          labelData={label}
-        />
+        <>
+          <LabelOverlay
+            key={`${sample.id}-${label.type}-${idx}`}
+            labelData={label}
+          />
+          <ConfidenceOverlay
+            key={`${sample.id}-${label.type}-${idx}`}
+            labelData={label}
+          />
+        </>
       ))}
     </Box>
   );

@@ -60,7 +60,8 @@ export default function Sidebar() {
     () => ({
       width: "100%",
       margin: 0,
-      padding: "8px 16px",
+      paddingX: "4px",
+      paddingY: "4px",
       "& .MuiFormControlLabel-label": {
         fontSize: "0.875rem",
       },

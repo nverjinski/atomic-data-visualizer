@@ -23,3 +23,11 @@ export const imageSelector = selector({
     return response.samples;
   },
 });
+
+const confidenceThresholdState = atom({
+  key: "confidenceThresholdState",
+  default: {
+    high: 0.999,
+    low: 0.001,
+  },
+});

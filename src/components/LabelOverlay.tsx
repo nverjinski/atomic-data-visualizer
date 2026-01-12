@@ -5,7 +5,7 @@ export type LabelDataType = {
   type: "prediction" | "ground_truth" | "confidence";
   box: number[];
   label: string;
-  confidence: number;
+  confidence?: number;
 };
 type LabelOverlayProps = {
   labelData: LabelDataType;
@@ -19,20 +19,23 @@ const LabelOverlay = ({ labelData }: LabelOverlayProps) => {
   const [x, y, w, h] = labelData.box;
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: `${x}%`,
-        top: `${y}%`,
-        width: `${w}%`,
-        height: `${h}%`,
-        border:
-          labelData.type === "prediction" ? "2px solid red" : "2px solid green",
-        pointerEvents: "none",
-      }}
-    >
-      <span className="label-text">{labelData.label}</span>
-    </div>
+    <>
+      <div
+        className={`absolute border-2 pointer-events-none ${
+          labelData.type === "prediction"
+            ? "border-red-500"
+            : "border-green-500"
+        }`}
+        style={{
+          left: `${x}%`,
+          top: `${y}%`,
+          width: `${w}%`,
+          height: `${h}%`,
+        }}
+      >
+        {/*<span className="label-text">{labelData.label}</span>*/}
+      </div>
+    </>
   );
 };
 export default LabelOverlay;
