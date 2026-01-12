@@ -1,4 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSetRecoilState } from "recoil";
+import { performanceStatsState } from "../state/performanceAtoms";
 import type { Sample } from "./ResponsiveGrid";
 import { Box } from "@mui/material";
 import { LabelOverlay } from "./index";
@@ -10,21 +12,85 @@ interface ImageProps {
 
 const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
   const [imageFailed, setImageFailed] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
 
-  // Handle image errors with automatic retry
-  const handleImageError = useCallback(() => {
-    setImageFailed(true);
-    if (retryCount < 2) {
-      // Retry up to 2 times with 1 second delay
-      setTimeout(() => {
-        setRetryCount((prev) => prev + 1);
-      }, 1000);
+  const setStats = useSetRecoilState(performanceStatsState);
+
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  /**
+   * Core loading logic with retry capability
+   * Handles the manual fetch to allow for AbortController cancellation
+   */
+  const loadImage = useCallback(
+    async (signal: AbortSignal, attempt = 0) => {
+      try {
+        const res = await fetch(sample.url, { signal });
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+
+        const blob = await res.blob();
+        const objectUrl = URL.createObjectURL(blob);
+
+        setImgSrc(objectUrl);
+        setImageFailed(false);
+        setStats((s) => ({ ...s, fullyLoaded: s.fullyLoaded + 1 }));
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          setStats((s) => ({ ...s, canceled: s.canceled + 1 }));
+          return;
+        }
+
+        // Network Retry Logic
+        if (attempt < 2) {
+          setTimeout(() => loadImage(signal, attempt + 1), 1500);
+        } else {
+          setImageFailed(true);
+        }
+      }
+    },
+    [sample.url, setStats]
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // In Viewport
+          const controller = new AbortController();
+          abortControllerRef.current = controller;
+
+          setStats((s) => ({ ...s, totalRequested: s.totalRequested + 1 }));
+          loadImage(controller.signal);
+        } else {
+          // Not in Viewport
+          if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+          }
+
+          if (imgSrc) {
+            URL.revokeObjectURL(imgSrc);
+            setImgSrc(null);
+          }
+        }
+      },
+      { rootMargin: "100px" } // Load slightly before it enters the viewport
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
     }
-  }, [retryCount]);
+
+    return () => {
+      observer.disconnect();
+      if (imgSrc) URL.revokeObjectURL(imgSrc);
+    };
+  }, [sample.url, loadImage, setStats]); // Note: imgSrc removed from deps to prevent re-run on setImgSrc
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         width: imageSize,
         height: imageSize,
@@ -40,38 +106,40 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
         position: "relative",
       }}
     >
-      <img
-        key={retryCount} // Force remount on retry
-        src={sample.url}
-        alt={`Sample ${sample.id}`}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          display: "block",
-        }}
-        onError={handleImageError}
-        onLoad={() => {
-          setImageFailed(false);
-        }}
-        //loading="lazy" // we're implementing our own lazy loading
-      />
-      {imageFailed && (
-        <div
+      {imgSrc && (
+        <img
+          src={imgSrc}
+          alt={`Sample ${sample.id}`}
           style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      )}
+
+      {imageFailed && (
+        <Box
+          sx={{
             position: "absolute",
             top: 0,
             left: 0,
             width: "100%",
             height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             background: "linear-gradient(135deg, #404040 0%, #000000 100%)",
-            //filter: "blur(4px)",
-            display: "block",
           }}
         />
       )}
-      {sample.labels.map((label) => (
-        <LabelOverlay key={label.type} labelData={label} />
+
+      {sample.labels.map((label, idx) => (
+        <LabelOverlay
+          key={`${sample.id}-${label.type}-${idx}`}
+          labelData={label}
+        />
       ))}
     </Box>
   );
