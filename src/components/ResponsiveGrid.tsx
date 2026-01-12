@@ -124,7 +124,7 @@ export default function ResponsiveGrid() {
           }}
           rowCount={rowCount}
           rowHeight={actualRowHeight}
-          overscanCount={5} // setting this high will look better, but using a priority queue is smarter
+          overscanCount={15} // setting this high will look better, but we're also using a priority queue
         />
       )}
     </Box>

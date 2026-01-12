@@ -72,17 +72,23 @@ const LazyImage = ({
       return;
     }
 
+    // Wait for scrollContainer to be available before creating observer
+    if (!scrollContainer) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // In Viewport
-          const controller = new AbortController();
-          abortControllerRef.current = controller;
-
-          setStats((s) => ({ ...s, totalRequested: s.totalRequested + 1 }));
-          loadImage(controller.signal);
+          // In Viewport - start loading if not already loading
+          if (!abortControllerRef.current) {
+            const controller = new AbortController();
+            abortControllerRef.current = controller;
+            setStats((s) => ({ ...s, totalRequested: s.totalRequested + 1 }));
+            loadImage(controller.signal);
+          }
         } else {
-          // Not in Viewport
+          // Not in Viewport - abort if still loading
           if (abortControllerRef.current) {
             abortControllerRef.current.abort();
             abortControllerRef.current = null;
@@ -101,8 +107,11 @@ const LazyImage = ({
 
     return () => {
       observer.disconnect();
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
     };
-  }, [sample.url, loadImage, setStats, imgSrc]);
+  }, [sample.url, loadImage, setStats, imgSrc, scrollContainer]);
 
   return (
     <Box
@@ -154,11 +163,11 @@ const LazyImage = ({
       {sample.labels.map((label, idx) => (
         <>
           <LabelOverlay
-            key={`${sample.id}-${label.type}-${idx}`}
+            key={`label-${sample.id}-${label.type}-${idx}`}
             labelData={label}
           />
           <ConfidenceOverlay
-            key={`${sample.id}-${label.type}-${idx}`}
+            key={`confidence-${sample.id}-${label.type}-${idx}`}
             labelData={label}
           />
         </>
