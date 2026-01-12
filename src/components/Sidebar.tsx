@@ -9,17 +9,32 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
+  Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { visibilityState } from "../state/atoms";
+import { performanceStatsState } from "../state/performanceAtoms";
+
+type PerformanceStats = {
+  totalRequested: number;
+  canceled: number;
+  fullyLoaded: number;
+};
 
 const SIDEBAR_WIDTH = 250;
 
 const labelItems = ["Prediction", "Ground Truth", "Confidence"];
+const performanceItems: Array<{ label: string; key: keyof PerformanceStats }> =
+  [
+    { label: "Total Requested", key: "totalRequested" },
+    { label: "Canceled", key: "canceled" },
+    { label: "Fully Loaded", key: "fullyLoaded" },
+  ];
 
 export default function Sidebar() {
   const [visibility, setVisibility] = useRecoilState(visibilityState);
+  const performanceStats = useRecoilValue(performanceStatsState);
 
   // Create stable change handlers to prevent re-renders
   const changeHandlers = useMemo(
@@ -76,22 +91,11 @@ export default function Sidebar() {
           elevation={0}
           sx={{
             backgroundColor: "transparent",
-            "&:before": {
-              display: "none",
-            },
             borderBottom: "1px solid",
             borderColor: (theme) => theme.palette.voxel.border,
           }}
         >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            sx={{
-              minHeight: 48,
-              "&.Mui-expanded": {
-                minHeight: 48,
-              },
-            }}
-          >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="subtitle1" fontWeight={600}>
               Labels
             </Typography>
@@ -118,6 +122,54 @@ export default function Sidebar() {
                       label={item}
                       sx={formControlSx}
                     />
+                  </ListItem>
+                );
+              })}
+            </List>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion
+          defaultExpanded
+          disableGutters
+          elevation={0}
+          sx={{
+            backgroundColor: "transparent",
+            borderBottom: "1px solid",
+            borderColor: (theme) => theme.palette.voxel.border,
+          }}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle1" fontWeight={600}>
+              Performance
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 0 }}>
+            <List disablePadding>
+              {performanceItems.map((item) => {
+                const value = performanceStats[item.key];
+
+                return (
+                  <ListItem key={item.label} disablePadding>
+                    <Box
+                      sx={{
+                        width: "100%",
+                        padding: "8px 16px",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Typography variant="body2" color="text.secondary">
+                        {item.label}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        fontWeight={600}
+                        color="primary"
+                      >
+                        {value}
+                      </Typography>
+                    </Box>
                   </ListItem>
                 );
               })}

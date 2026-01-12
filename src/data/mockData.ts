@@ -12,7 +12,7 @@ export const samples = Array.from({ length: 10000 }).map((_, i) => ({
       type: "ground_truth",
       box: [Math.random() * 100, Math.random() * 100, 45, 45],
       label: "car",
-      confidence: Math.random(),
+      confidence: Math.random() * 0.5 + 0.49,
     },
   ],
 }));
