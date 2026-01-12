@@ -1,4 +1,4 @@
-import { atom, selector } from "recoil";
+import { atom, atomFamily, selector } from "recoil";
 import { SampleService } from "../services/SampleService";
 
 export const visibilityState = atom({
@@ -29,5 +29,19 @@ export const confidenceThresholdState = atom({
   default: {
     low: 0,
     high: 1,
+  },
+});
+
+export const selectedImagesState = atomFamily({
+  key: "selectedImageState",
+  default: false,
+});
+
+export const selectedImageCount = selector({
+  key: "selectedImageCount",
+  get: ({ get }) => {
+    const samples = get(imageSelector);
+    return samples.filter((sample) => get(selectedImagesState(sample.id)))
+      .length;
   },
 });
