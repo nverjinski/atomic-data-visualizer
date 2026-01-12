@@ -28,6 +28,7 @@ export default function ResponsiveGrid() {
   });
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<any>(null);
 
   const samples = useRecoilValue(imageSelector) as Sample[];
 
@@ -65,7 +66,12 @@ export default function ResponsiveGrid() {
 
   // Cell renderer
   const Cell = useCallback(
-    ({ columnIndex, rowIndex, style }: CellComponentProps) => {
+    ({
+      columnIndex,
+      rowIndex,
+      style,
+      scrollContainer,
+    }: CellComponentProps & { scrollContainer?: HTMLElement }) => {
       const index = rowIndex * columnCount + columnIndex;
       const sample = samples[index];
 
@@ -84,7 +90,11 @@ export default function ResponsiveGrid() {
             boxSizing: "border-box",
           }}
         >
-          <LazyImage imageSample={sample} imageSize={imageSize} />
+          <LazyImage
+            imageSample={sample}
+            imageSize={imageSize}
+            scrollContainer={scrollContainer}
+          />
         </div>
       );
     },
@@ -104,9 +114,10 @@ export default function ResponsiveGrid() {
       {containerSize.width > 0 && containerSize.height > 0 && (
         <Grid
           cellComponent={Cell}
-          cellProps={{}}
+          cellProps={{ scrollContainer: gridRef.current?.element }}
           columnCount={columnCount}
           columnWidth={actualColumnWidth}
+          gridRef={gridRef}
           style={{
             height: containerSize.height,
             width: containerSize.width,

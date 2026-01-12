@@ -11,9 +11,14 @@ const imageCache = new Map<string, string>();
 interface ImageProps {
   imageSample: Sample;
   imageSize: number;
+  scrollContainer?: HTMLElement;
 }
 
-const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
+const LazyImage = ({
+  imageSample: sample,
+  imageSize,
+  scrollContainer,
+}: ImageProps) => {
   const [imageFailed, setImageFailed] = useState(false);
   // Initialize with cached image if available
   const [imgSrc, setImgSrc] = useState<string | null>(
@@ -84,7 +89,10 @@ const LazyImage = ({ imageSample: sample, imageSize }: ImageProps) => {
           }
         }
       },
-      { rootMargin: "100px" } // Load slightly before it enters the viewport
+      {
+        root: scrollContainer, // Explicitly use Grid's scroll container
+        rootMargin: "500px",
+      }
     );
 
     if (containerRef.current) {
