@@ -15,6 +15,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { visibilityState } from "../state/atoms";
 import { performanceStatsState } from "../state/performanceAtoms";
+import { ConfidenceThresholdSlider } from "./index";
 
 type PerformanceStats = {
   totalRequested: number;
@@ -127,6 +128,25 @@ export default function Sidebar() {
                 );
               })}
             </List>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion
+          defaultExpanded
+          disableGutters
+          elevation={0}
+          sx={{
+            backgroundColor: "transparent",
+            borderBottom: "1px solid",
+            borderColor: (theme) => theme.palette.voxel.border,
+          }}
+        >
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="subtitle1" fontWeight={600}>
+              Filters
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 2 }}>
+            <ConfidenceThresholdSlider />
           </AccordionDetails>
         </Accordion>
         <Accordion

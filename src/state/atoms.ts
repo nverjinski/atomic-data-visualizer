@@ -10,7 +10,7 @@ export const visibilityState = atom({
   },
 });
 
-const imageRefreshTrigger = atom({
+export const imageRefreshTrigger = atom({
   key: "imageRefreshTrigger",
   default: 0,
 });
@@ -24,10 +24,10 @@ export const imageSelector = selector({
   },
 });
 
-const confidenceThresholdState = atom({
+export const confidenceThresholdState = atom({
   key: "confidenceThresholdState",
   default: {
-    high: 0.999,
     low: 0.001,
+    high: 0.999,
   },
 });
