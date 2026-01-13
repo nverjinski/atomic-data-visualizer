@@ -1,4 +1,10 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useDeferredValue,
+} from "react";
 import { Grid } from "react-window";
 import type { CellComponentProps } from "react-window";
 import { Box } from "@mui/material";
@@ -40,7 +46,9 @@ export default function ResponsiveGrid() {
   ) as Sample[];
   const useFilteredSamples = useRecoilValue(filterImagesState);
 
-  const samples = useFilteredSamples ? filteredSamples : rawSamples;
+  const samples = useDeferredValue(
+    useFilteredSamples ? filteredSamples : rawSamples
+  );
 
   // Measure container size
   useEffect(() => {
