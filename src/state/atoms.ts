@@ -50,3 +50,25 @@ export const filterImagesState = atom({
   key: "filterImagesState",
   default: false,
 });
+
+export const filteredImagesByConfidenceSelector = selector({
+  key: "filteredImagesByConfidence",
+  get: ({ get }) => {
+    const images = get(imageSelector);
+    const thresholds = get(confidenceThresholdState);
+
+    return images.filter((image) => {
+      // The first label always has the confidence value
+      const firstLabel = image.labels[0];
+      if (!firstLabel || firstLabel.confidence === undefined) {
+        return true; // Keep images without confidence values
+      }
+
+      // Keep images where confidence is within range
+      return (
+        firstLabel.confidence >= thresholds.low &&
+        firstLabel.confidence <= thresholds.high
+      );
+    });
+  },
+});

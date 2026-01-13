@@ -5,7 +5,11 @@ import { Box } from "@mui/material";
 import { LazyImage } from "./index";
 import type { LabelDataType } from "./LabelOverlay";
 import { useRecoilValue } from "recoil";
-import { imageSelector } from "../state/atoms";
+import {
+  imageSelector,
+  filterImagesState,
+  filteredImagesByConfidenceSelector,
+} from "../state/atoms";
 
 export interface Sample {
   id: number;
@@ -30,7 +34,13 @@ export default function ResponsiveGrid() {
   const containerRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<any>(null);
 
-  const samples = useRecoilValue(imageSelector) as Sample[];
+  const rawSamples = useRecoilValue(imageSelector) as Sample[];
+  const filteredSamples = useRecoilValue(
+    filteredImagesByConfidenceSelector
+  ) as Sample[];
+  const useFilteredSamples = useRecoilValue(filterImagesState);
+
+  const samples = useFilteredSamples ? filteredSamples : rawSamples;
 
   // Measure container size
   useEffect(() => {
