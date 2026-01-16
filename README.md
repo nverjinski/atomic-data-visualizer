@@ -5,6 +5,7 @@ A high-performance image visualization application built with React, featuring a
 ## Known Deficiencies
 
 - There is a memory leak in the module level cache. Cached images are never removed... todo!
+- Some type definitons should be defined in a types directory to consolidate imports throughout the code... todo!
 
 ## 🚀 Core Technologies
 
