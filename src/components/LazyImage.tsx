@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useSetRecoilState, useRecoilState } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilState } from "recoil";
 import { performanceStatsState } from "../state/performanceAtoms";
-import { selectedImagesState } from "../state/atoms";
+import { selectedIdsState, isSelectedState } from "../state/atoms";
 import type { Sample } from "./ResponsiveGrid";
 import { Box } from "@mui/material";
 import { LabelOverlay, ConfidenceOverlay } from "./index";
@@ -27,12 +27,14 @@ const LazyImage = ({
   );
 
   const setStats = useSetRecoilState(performanceStatsState);
-  const [isSelected, setSelected] = useRecoilState(
-    selectedImagesState(sample.id)
-  );
+  const [isSelected, setIsSelected] = useRecoilState(isSelectedState(sample.id));
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const handleToggle = () => {
+    setIsSelected(!isSelected);
+  };
 
   /**
    * Core loading logic with retry capability
@@ -135,7 +137,8 @@ const LazyImage = ({
         position: "relative",
         border: isSelected ? "3px solid var(--color-primary)" : "none",
       }}
-      onClick={() => setSelected(!isSelected)}
+      //onClick={() => setSelected(!isSelected)}
+      onClick={handleToggle}
     >
       {imgSrc && (
         <img
