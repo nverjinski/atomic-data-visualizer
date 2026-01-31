@@ -230,4 +230,4 @@ With the implemented optimizations:
 
 ## 🤝 Contributing
 
-This is just a toy project to get hands on experience with various useful techniques. No need for contributions... unless you want to.
+This is just a toy project to get hands on experience with a few techniques and technologies. No need for contributions... unless you want to.
